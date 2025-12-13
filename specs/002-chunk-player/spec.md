@@ -2,7 +2,7 @@
 
 ## Overview
 
-Obsidian Flashread plugin - Feature 2
+Archetype plugin - Feature 2
 
 ## Problem Statement
 
@@ -166,10 +166,10 @@ onClose() {
 
 ## Configuration
 
-### Settings: FlashreadSettings
+### Settings: ArchetypeSettings
 
 ```typescript
-interface FlashreadSettings {
+interface ArchetypeSettings {
   wpm: string;       // Words per minute (default: "600")
   wordcount: string; // Words per chunk (default: "1")
 }

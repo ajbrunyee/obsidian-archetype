@@ -2,7 +2,7 @@
 
 ## Overview
 
-Obsidian Flashread plugin - Feature 3
+Archetype plugin - Feature 3
 
 ## Problem Statement
 
@@ -57,7 +57,7 @@ Extends the existing `ViewModal` with typing-specific logic and UI elements.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Flashread Overlay                     │
+│                    Archetype Overlay                     │
 │                     (100vw × 100vh)                      │
 │                                                          │
 │                                                          │
@@ -105,7 +105,7 @@ All chunks complete → Close overlay
 **New Settings:**
 
 ```typescript
-interface FlashreadSettings {
+interface ArchetypeSettings {
   wpm: string;                    // Existing
   wordcount: string;              // Existing
   progressionMode: string;        // "auto" | "typing"
@@ -141,12 +141,12 @@ Called from `onOpen()` when `progressionMode === "typing"`:
 setupTypingMode() {
   // Create input container
   const inputContainer = document.createElement("div");
-  inputContainer.classList.add("flashread-typing-container");
+  inputContainer.classList.add("archetype-typing-container");
   
   // Create input field
   const inputField = document.createElement("input");
   inputField.type = "text";
-  inputField.classList.add("flashread-typing-input");
+  inputField.classList.add("archetype-typing-input");
   inputField.placeholder = "Type the text above...";
   inputField.autocomplete = "off";
   inputField.autocorrect = "off";
@@ -154,7 +154,7 @@ setupTypingMode() {
   
   // Create feedback indicator
   const feedback = document.createElement("div");
-  feedback.classList.add("flashread-typing-feedback");
+  feedback.classList.add("archetype-typing-feedback");
   
   // Attach input handler
   inputField.addEventListener("input", this.onTypingInput.bind(this));
@@ -316,7 +316,7 @@ onTypingKeydown(event: KeyboardEvent) {
 
 ```css
 /* Typing mode container */
-.flashread-typing-container {
+.archetype-typing-container {
   position: absolute;
   bottom: 25vh;
   width: 60vw;
@@ -325,7 +325,7 @@ onTypingKeydown(event: KeyboardEvent) {
 }
 
 /* Typing input field */
-.flashread-typing-input {
+.archetype-typing-input {
   width: 100%;
   font-size: 32px;
   padding: 15px 20px;
@@ -338,12 +338,12 @@ onTypingKeydown(event: KeyboardEvent) {
   transition: border-color 0.2s;
 }
 
-.flashread-typing-input:focus {
+.archetype-typing-input:focus {
   border-color: var(--interactive-accent);
 }
 
 /* Feedback indicator */
-.flashread-typing-feedback {
+.archetype-typing-feedback {
   position: absolute;
   bottom: 18vh;
   font-size: 24px;
@@ -352,18 +352,18 @@ onTypingKeydown(event: KeyboardEvent) {
   transition: opacity 0.2s;
 }
 
-.flashread-typing-feedback.correct {
+.archetype-typing-feedback.correct {
   color: var(--text-success);
   opacity: 1;
 }
 
-.flashread-typing-feedback.incorrect {
+.archetype-typing-feedback.incorrect {
   color: var(--text-error);
   opacity: 1;
 }
 
 /* Adjust displayer position when typing mode active */
-.flashread-overlay.typing-mode .flashread-displayer {
+.archetype-overlay.typing-mode .archetype-displayer {
   height: 40vh;
   align-items: flex-start;
   padding-top: 15vh;

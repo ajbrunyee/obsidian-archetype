@@ -2,7 +2,7 @@
 
 ## Overview
 
-Obsidian Flashread plugin - Feature 1
+Archetype plugin - Feature 1
 
 ## Problem Statement
 
@@ -42,13 +42,13 @@ Reading long-form text in Obsidian can be time-consuming. Speed reading techniqu
 
 ## Design
 
-### Component: FlashreadOverlay
+### Component: ArchetypeOverlay
 
 The overlay is implemented as a full-screen fixed-position DOM element appended directly to `document.body`, bypassing Obsidian's Modal constraints.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Flashread Overlay                     │
+│                    Archetype Overlay                     │
 │                     (100vw × 100vh)                      │
 │                                                          │
 │                                                          │
@@ -66,8 +66,8 @@ The overlay is implemented as a full-screen fixed-position DOM element appended 
 
 ### CSS Architecture
 
-- `.flashread-overlay`: Full-screen container with `position: fixed`, `z-index: 9999`
-- `.flashread-displayer`: Fixed-size inner container (90vw × 70vh) with centered text
+- `.archetype-overlay`: Full-screen container with `position: fixed`, `z-index: 9999`
+- `.archetype-displayer`: Fixed-size inner container (90vw × 70vh) with centered text
 - Uses `var(--background-primary)` for theme integration
 
 ### Interaction Model
@@ -81,8 +81,8 @@ The overlay is implemented as a full-screen fixed-position DOM element appended 
 
 ### File: main.ts - ViewModal.onOpen()
 
-1. Create overlay div with class `flashread-overlay`
-2. Create displayer div with class `flashread-displayer`
+1. Create overlay div with class `archetype-overlay`
+2. Create displayer div with class `archetype-displayer`
 3. Attach click handler for dismissal
 4. Append to `document.body`
 5. Hide underlying Obsidian modal (`modalEl.style.display = "none"`)
@@ -90,7 +90,7 @@ The overlay is implemented as a full-screen fixed-position DOM element appended 
 ### File: styles.css
 
 ```css
-.flashread-overlay {
+.archetype-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   width: 100vw; height: 100vh;
@@ -101,7 +101,7 @@ The overlay is implemented as a full-screen fixed-position DOM element appended 
   justify-content: center;
 }
 
-.flashread-displayer {
+.archetype-displayer {
   width: 90vw; height: 70vh;
   min-width: 90vw; min-height: 70vh;
   max-width: 90vw; max-height: 70vh;
