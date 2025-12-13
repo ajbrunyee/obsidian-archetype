@@ -32,10 +32,7 @@ For detailed planning, tasks, and development notes, see:
 - **`inbox/BACKLOG.md`** - Development backlog and detailed tasks (not tracked in git)
 
 ## Reference Files
-- [BACKLOG.md](BACKLOG.md) - Feature backlog and vision
-- [NAME.md](NAME.md) - Project naming and branding notes
-- [RENAME_PLAN.md](RENAME_PLAN.md) - Renaming strategy notes
-- [VERIFICATION.md](VERIFICATION.md) - Testing and verification notes
+All tracked reference files have been archived. See `inbox/BACKLOG.md` for current development planning.
 
 ## Notes for AI Agents
 
