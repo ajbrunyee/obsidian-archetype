@@ -1,5 +1,9 @@
 # Technical Debt - Smart Boundary Detection
 
+**Status**: Documented for future consideration (Not currently planned for implementation)
+
+**Note**: This is a design exploration, NOT a committed feature. The current behavior (character-exact chunking) is the intended behavior for now.
+
 ## Issue
 
 Character-based chunking currently splits text at arbitrary boundaries, which can break hyphenated words mid-word, creating unreadable segments for speed reading.
@@ -42,12 +46,15 @@ Result:
 3. Complex algorithm with many edge cases
 4. Better to get user feedback on core feature first
 5. May not be needed if users prefer word-based
+6. **Current behavior is acceptable** - character-exact is predictable
 
-## Test Coverage
+## Current Behavior is CORRECT
 
-See `ChunkingService.smart-boundaries.test.ts`:
-- ✅ Tests documenting problem (passing)
-- ⏸️ Tests for desired behavior (skipped with `.skip`)
+The existing tests in `ChunkingService.test.ts` document the CORRECT current behavior:
+- Character-based chunking is character-exact (no smart boundaries)
+- Word-based chunking handles hyphens naturally (splits on whitespace)
+
+**This is the intended behavior.** No tests are failing. No behavior needs fixing.
 
 ## Implementation Strategy (When Ready)
 
@@ -154,9 +161,11 @@ Should implement:
 
 ## Related Files
 
-- `src/domain/chunking/ChunkingService.ts` - Implementation
-- `src/domain/chunking/ChunkingService.smart-boundaries.test.ts` - Tests
+- `src/domain/chunking/ChunkingService.ts` - Current implementation (character-exact)
+- `src/domain/chunking/ChunkingService.test.ts` - Tests documenting CURRENT behavior
 - `specs/001-chunk-display/domain/ubiquitous-language.md` - Segmentation Strategy
+
+**No test files document smart boundaries** - this is deliberate. Tests are SSOT for current behavior only.
 
 ## Success Criteria
 
@@ -173,12 +182,12 @@ Should implement:
 - Edge case handling (1-2h)
 - Testing and refinement (1h)
 
-## Alternative: Don't Fix
+## Alternative: Don't Fix (Current Decision)
 
-**We could also:**
-- Document that character-based chunking is "character-exact" (current behavior)
-- Recommend word-based chunking for best readability
-- Only implement smart boundaries if users specifically request it
+**Current decision:**
+- Document that character-based chunking is "character-exact" ✅
+- Recommend word-based chunking for best readability ✅
+- Only implement smart boundaries if users specifically request it ✅
 
-This might be the pragmatic choice given word-based works well.
+**This is the pragmatic choice** given word-based works well. The current behavior is correct and intentional.
 
