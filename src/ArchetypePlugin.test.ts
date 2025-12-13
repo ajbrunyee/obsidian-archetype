@@ -8,7 +8,11 @@ describe('ArchetypePlugin', () => {
 	let plugin: ArchetypePlugin;
 
 	beforeEach(() => {
-		plugin = new ArchetypePlugin();
+		// Mock app and manifest required by Plugin constructor
+		const mockApp = {} as any;
+		const mockManifest = {} as any;
+		
+		plugin = new ArchetypePlugin(mockApp, mockManifest);
 		
 		// Setup default mocks for Plugin methods
 		plugin.loadData = vi.fn().mockResolvedValue({});
