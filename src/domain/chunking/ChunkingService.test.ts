@@ -69,6 +69,26 @@ describe('ChunkingService', () => {
 			expect(sequence.getChunk(2)?.content).toBe('you?');
 		});
 
+		it('should treat hyphenated words as single words', () => {
+			const text = 'A well-known state-of-the-art solution';
+			const sequence = ChunkingService.chunkByWords(text, 2);
+
+			// Hyphenated words are treated as single units
+			expect(sequence.length).toBe(2);
+			expect(sequence.getChunk(0)?.content).toBe('A well-known');
+			expect(sequence.getChunk(1)?.content).toBe('state-of-the-art solution');
+		});
+
+		it('should handle em-dashes and hyphens correctly', () => {
+			const text = 'Hello—world and well-known text';
+			const sequence = ChunkingService.chunkByWords(text, 2);
+
+			// Em-dash without spaces creates single "word", hyphen is within word
+			expect(sequence.length).toBe(2);
+			expect(sequence.getChunk(0)?.content).toBe('Hello—world and');
+			expect(sequence.getChunk(1)?.content).toBe('well-known text');
+		});
+
 		it('should return empty sequence for empty text', () => {
 			const sequence = ChunkingService.chunkByWords('', 3);
 			expect(sequence.isEmpty).toBe(true);

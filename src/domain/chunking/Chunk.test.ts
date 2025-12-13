@@ -64,6 +64,21 @@ describe('Chunk', () => {
 			expect(chunk.wordCount()).toBe(2);
 		});
 
+		it('should count hyphenated words as single word', () => {
+			const chunk = new Chunk('well-known', 0);
+			expect(chunk.wordCount()).toBe(1);
+		});
+
+		it('should count multi-hyphenated words as single word', () => {
+			const chunk = new Chunk('state-of-the-art', 0);
+			expect(chunk.wordCount()).toBe(1);
+		});
+
+		it('should handle mixture of hyphenated and regular words', () => {
+			const chunk = new Chunk('A well-known solution', 0);
+			expect(chunk.wordCount()).toBe(3); // "A", "well-known", "solution"
+		});
+
 		it('should handle single character as one word', () => {
 			const chunk = new Chunk('A', 0);
 			expect(chunk.wordCount()).toBe(1);
