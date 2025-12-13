@@ -16,7 +16,7 @@
 ```
 User is reading in Obsidian
       ↓
-Selects text passage
+[OPTIONAL] Selects text passage
       ↓
 Opens command palette (Cmd/Ctrl+P)
       ↓
@@ -28,6 +28,11 @@ Presses Enter
       ↓
 Full-screen overlay appears with first chunk
 ```
+
+**Input Selection Logic**:
+- If text is selected → Use selection only
+- If no selection → Use entire document
+- If document is empty → Show error notice
 
 **Timing expectations**:
 - Command → Overlay: <100ms (instant feel)
@@ -324,28 +329,31 @@ Effect: Low-light reading, reduced eye strain
 
 **Scenario**: User invokes command without selecting text
 
-**Current spec behavior**: "No chunks to display → immediate close"
+**Current behavior**: Fallback to entire document
 
 **What the user sees**:
 - Command palette closes
-- Overlay never opens (or opens and closes in <16ms)
+- Overlay opens with entire document content
 
-**What the user experiences**:
-- Confusion: "Did it work?"
-- No feedback about what went wrong
+**Previous behavior** (v0.0.x): "No chunks to display → immediate close"
 
-**Recommended improvement**:
+**Improved UX** (v0.1.0):
 ```typescript
-if (selection.length === 0) {
-  new Notice("Please select text before starting Archetype");
-  return; // Don't open overlay
+// Use selection if available, otherwise entire document
+let text = editor.getSelection();
+if (!text || text.trim().length === 0) {
+  text = editor.getValue();
+}
+if (!text || text.trim().length === 0) {
+  new Notice("No text to read");
+  return;
 }
 ```
 
 **Better UX**:
-- Clear error message (toast notification)
-- Obsidian's standard Notice component (familiar pattern)
-- User understands what to do next (select text, retry)
+- No manual selection required for whole-document reading
+- Selection remains optional for reading specific sections
+- Clear error message only when document is truly empty
 
 ---
 

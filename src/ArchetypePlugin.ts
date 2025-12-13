@@ -20,17 +20,22 @@ export class ArchetypePlugin extends Plugin {
 			id: 'start-speed-reading',
 			name: 'Start speed reading',
 			editorCallback: (editor: Editor, _view: MarkdownView) => {
-				const selection = editor.getSelection();
+				// Use selection if available, otherwise use entire document
+				let text = editor.getSelection();
 				
-				if (!selection || selection.trim().length === 0) {
-					new Notice('Please select some text to read');
+				if (!text || text.trim().length === 0) {
+					text = editor.getValue();
+				}
+				
+				if (!text || text.trim().length === 0) {
+					new Notice('No text to read');
 					return;
 				}
 
 				try {
-					// Create segments from selected text (word-based, 3 words per segment)
+					// Create segments from text (word-based, 3 words per segment)
 					const strategy = ChunkingStrategy.wordBased(3);
-					const sequence = ChunkingService.chunk(selection, strategy);
+					const sequence = ChunkingService.chunk(text, strategy);
 
 					// Setup timing (300 WPM - normal speed)
 					const timing = new ChunkTiming(ReadingSpeed.NORMAL);

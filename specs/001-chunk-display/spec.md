@@ -31,6 +31,25 @@ Reading long-form text in Obsidian can be time-consuming. Speed reading techniqu
 - Maintain fixed dimensions regardless of text length
 - Use theme-aware background colors (light/dark mode support)
 - Support single-click dismissal
+- Accept input from user selection or entire document
+
+### Input Selection Mode
+
+**Priority**: 
+1. Use selected text if available (user has highlighted specific portion)
+2. Fallback to entire document content if no selection
+
+**Rationale**: 
+- Users often want to speed read entire notes without manual selection
+- Selection remains optional for reading specific sections
+- Provides flexibility without requiring extra commands
+
+**Behavior**:
+```
+editor.getSelection() → non-empty → use selection
+editor.getSelection() → empty → use editor.getValue()
+editor.getValue() → empty → show error notice
+```
 
 ### Non-Functional
 
