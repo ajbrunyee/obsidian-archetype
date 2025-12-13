@@ -4,11 +4,30 @@ This directory contains the domain model documentation for Spec 001: Chunk Displ
 
 ## 📚 Documentation Structure
 
-### [ubiquitous-language.md](./ubiquitous-language.md)
-**Purpose**: Defines the shared vocabulary used across the entire feature.
+### [TERMINOLOGY-BRIDGE.md](./TERMINOLOGY-BRIDGE.md)
+**Purpose**: Maps implementation terms (Chunk) to Ubiquitous Language terms (Segment).
 
 **Key Sections**:
-- Core Concepts (Chunk, Text Source, Display Window, etc.)
+- Why the mismatch exists
+- Current mapping table
+- Usage guidelines (when to use which term)
+- UI implementation guidance
+- Code review checklist
+
+**When to read**:
+- **FIRST** - Before reading other docs
+- Before implementing UI components
+- During code reviews
+- When confused about "chunk" vs "segment"
+
+---
+
+### [ubiquitous-language.md](./ubiquitous-language.md)
+**Purpose**: Defines the shared vocabulary used across the entire feature, aligned with project-wide Archetype UL.
+
+**Key Sections**:
+- Core Concepts (TextSegment, SourceText, Display Window, etc.)
+- Alignment with project-wide UL (Session, Mode, Constraint)
 - Domain Relationships diagram
 - Business Rules
 - Anti-patterns to avoid
@@ -18,6 +37,8 @@ This directory contains the domain model documentation for Spec 001: Chunk Displ
 - When naming classes, methods, or variables
 - During code reviews
 - When onboarding to the project
+
+**Important**: Also see [TERMINOLOGY-BRIDGE.md](./TERMINOLOGY-BRIDGE.md) for mapping between implementation (Chunk) and UL (Segment) terms.
 
 ---
 
@@ -119,7 +140,7 @@ Value objects are immutable. Benefits:
 
 ### Pure Functions
 Domain logic should be pure wherever possible:
-- Chunking algorithms
+- Chunking algorithms (segmentation)
 - Duration calculations
 - Sequence navigation
 
@@ -133,6 +154,26 @@ This makes the domain:
 - Highly testable
 - Reusable
 - Easy to understand
+
+### Project Philosophy Integration
+
+This implementation follows the Archetype project philosophy:
+
+> **Learning quality is measured by stability, intelligibility, and convergence under constraint — not speed or polish.**
+
+Applied to speed reading (Spec 001):
+- **Constraint**: Fixed display window + timed progression
+- **Stability**: Foundation for measuring consistent comprehension
+- **Not speed alone**: WPM is a parameter, not the goal
+- **Convergence**: Future specs will track improvement over time
+- **Fluency**: Stable control under reading speed constraint
+
+**Core Constraints in This Mode**:
+1. Display Window is fixed (no resizing)
+2. Segment timing calculated from WPM
+3. Single segment focus (one at a time)
+
+These constraints force attention and create the foundation for measuring fluency.
 
 ---
 
