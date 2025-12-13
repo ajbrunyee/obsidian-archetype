@@ -26,3 +26,7 @@ inbox/
 
 # Archive - historical files not needed in repo
 archive/
+
+# Test coverage
+coverage/
+.vitest/
