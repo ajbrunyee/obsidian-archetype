@@ -23,3 +23,6 @@ data.json
 
 # Inbox - untracked planning and notes
 inbox/
+
+# Archive - historical files not needed in repo
+archive/
