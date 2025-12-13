@@ -1,6 +1,6 @@
 # Domain Model Implementation - Summary
 
-## ✅ Completed (Phase 1 & 2 + UL Alignment)
+## ✅ Completed (All 3 Phases + UL Alignment)
 
 ### Domain Documentation
 - ✅ **Ubiquitous Language** - Core concepts, relationships, business rules, **aligned with project-wide Archetype UL**
@@ -15,8 +15,9 @@
 - ✅ Aligned with project concepts: **Session**, **Mode**, **Constraint**
 - ✅ Integrated project philosophy: constraint-based learning quality
 - ✅ Documented terminology bridge for implementation vs UL terms
+- ✅ Enforced core principle: **Comprehension > Exactness** (word-based only)
 
-**Note**: Implementation code still uses `Chunk` class names (technical term), while documentation and UI will use "Segment" (business term). See `TERMINOLOGY-BRIDGE.md` for details.
+**Note**: Implementation code uses `Chunk` class names (technical term), while documentation and UI use "Segment" (business term). See `TERMINOLOGY-BRIDGE.md` for details.
 
 ### Chunking Domain
 ✅ **Chunk** (Value Object) - **UL: TextSegment**
@@ -63,65 +64,60 @@
 - Aggregate chunk durations
 - **7 tests passing**
 
+### Progression Domain
+✅ **ProgressionState** (Enum)
+- IDLE, PLAYING, PAUSED, COMPLETED states
+
+✅ **ChunkProgression** (Entity) - **UL: Segment Progression**
+- State management (transitions, validation)
+- Navigation (next, previous, boundary checking)
+- Control flow (start, pause, resume, stop, reset)
+- Integration point for ChunkSequence and ChunkTiming
+- **31 tests passing**
+
 ---
 
 ## Test Coverage
 
-### Total: **112 tests passing** 🎉
+### Total: **138 tests passing** 🎉
 
 **By Domain:**
-- Chunking: 84 tests
+- Chunking: 79 tests
 - Timing: 28 tests
+- Progression: 31 tests
 
 **Test Execution:**
 ```bash
-npm test -- src/domain  # All domain tests
+npm test -- src/domain  # All domain tests (138 tests)
 npm test -- src/domain/chunking  # Chunking tests only
 npm test -- src/domain/timing  # Timing tests only
+npm test -- src/domain/progression  # Progression tests only
 ```
 
 ---
 
-## Next Steps (Phase 3)
+## Next Steps (UI Implementation)
 
-### ⬜ ChunkProgression (Entity) - **UL: Segment Progression**
-The progression entity manages the playback state and navigation through a chunk sequence.
+### ✅ Domain Layer Complete!
 
-**Required Implementation:**
-```typescript
-enum ProgressionState {
-  IDLE,
-  PLAYING,
-  PAUSED,
-  COMPLETED
-}
+All three phases implemented with comprehensive test coverage.
 
-class ChunkProgression {
-  // State management
-  start(): void
-  pause(): void
-  resume(): void
-  stop(): void
-  
-  // Navigation
-  next(): Chunk | null
-  previous(): Chunk | null
-  
-  // Queries
-  get state(): ProgressionState
-  get currentIndex(): number
-  get currentChunk(): Chunk | null
-}
-```
+### ⬜ UI Layer (Next)
 
-**Test Cases to Implement:**
-- State transitions (IDLE → PLAYING → PAUSED → PLAYING)
-- Cannot start when already playing
-- Navigation (next/previous)
-- Boundaries (next at end → COMPLETED)
-- Timer management (cleanup on stop/pause)
+Build the Display Window and wire up to domain:
 
-**Estimated:** ~15-20 tests
+**Components to Build:**
+1. **ArchetypeOverlay** - Full-screen container
+2. **SegmentDisplay** - Fixed-size text display
+3. **SegmentPlayer** - Coordinates progression and timing
+
+**Integration:**
+- Use ChunkingService to create segments from text
+- Use ChunkProgression to manage state
+- Use ChunkTiming to calculate display durations
+- Wire to browser timers for timed playback
+
+**Estimated:** ~6-8 hours for UI + integration
 
 ---
 
@@ -294,6 +290,10 @@ The domain model is now ready to be consumed by:
 5e0fcad - docs: add comprehensive domain model documentation for spec 001
 d08bb00 - feat: implement core domain model with TDD (Phase 1 & 2)
 9886688 - docs: align domain UL with project-wide Archetype philosophy
+e45b03c - test: add hyphenated word handling tests
+dee0821 - fix: remove future-behavior tests, keep SSOT for current behavior
+5bf537f - refactor: remove character-based chunking (violates comprehension principle)
+be7eeb7 - feat: implement ChunkProgression entity (Phase 3 complete)
 ```
 
 **Current branch:** `main`
@@ -302,6 +302,7 @@ d08bb00 - feat: implement core domain model with TDD (Phase 1 & 2)
 - Implementation uses `Chunk` (technical term)
 - UL and UI will use `Segment` (business term)
 - See `TERMINOLOGY-BRIDGE.md` for mapping
+- **Comprehension > Exactness** enforced (word-based only)
 
 ---
 
