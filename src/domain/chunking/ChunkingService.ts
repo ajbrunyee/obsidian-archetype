@@ -48,25 +48,11 @@ export class ChunkingService {
 
 	/**
 	 * Chunk text by character count
+	 * @deprecated Not yet implemented - would break hyphenated words
+	 * @throws Error - Character-based chunking violates comprehension principle
 	 */
 	static chunkByCharacters(text: string, charCount: number): ChunkSequence {
-		if (charCount <= 0) {
-			throw new Error('Character count must be positive');
-		}
-
-		// Handle empty text
-		if (text.length === 0) {
-			return new ChunkSequence([]);
-		}
-
-		const chunks: Chunk[] = [];
-
-		for (let i = 0; i < text.length; i += charCount) {
-			const chunkContent = text.slice(i, i + charCount);
-			chunks.push(new Chunk(chunkContent, chunks.length));
-		}
-
-		return new ChunkSequence(chunks);
+		throw new Error('Character-based chunking is not yet supported. Use chunkByWords() for comprehension-focused segmentation.');
 	}
 }
 

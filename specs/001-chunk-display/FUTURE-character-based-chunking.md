@@ -1,10 +1,16 @@
-# Technical Debt - Smart Boundary Detection
+# Future Feature - Character-Based Segmentation
 
-**Status**: Documented for future consideration (Not currently planned for implementation)
+**Status**: Not Implemented (Decision: Word-Based Only for Now)
 
-**Note**: This is a design exploration, NOT a committed feature. The current behavior (character-exact chunking) is the intended behavior for now.
+**Decision**: Character-based segmentation has been removed because it violates the core principle: **Comprehension > Exactness**
 
-## Issue
+## Core Principle
+
+> **Comprehension always wins.**
+
+No segmentation strategy should break words (especially hyphenated words like "state-of-the-art") in ways that harm readability.
+
+## Why Character-Based Was Removed
 
 Character-based chunking currently splits text at arbitrary boundaries, which can break hyphenated words mid-word, creating unreadable segments for speed reading.
 

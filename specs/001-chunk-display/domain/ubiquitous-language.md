@@ -59,21 +59,25 @@ This feature implements:
 ### Segmentation Strategy
 **Definition**: The algorithm/rules for dividing SourceText into TextSegments.
 
-**Replaces**: "Chunking Strategy" from original spec
-**Why**: Consistency with "Segment" terminology
+**Current Implementation**: Word-Based Only
 
 **Types**:
-1. **Word-Based Segmentation**: Splits by word boundaries (whitespace)
+1. **Word-Based Segmentation**: Splits by word boundaries (whitespace) ✅ Implemented
    - Segment size measured in word count
    - Preserves word integrity
+   - Maintains comprehension (never breaks hyphenated words)
 
-2. **Character-Based Segmentation**: Splits by character count
-   - Segment size measured in character count
-   - May split words mid-character
+2. **Character-Based Segmentation**: ❌ Not Yet Supported
+   - Would split by character count
+   - Removed because it breaks hyphenated words
+   - Violates core principle: comprehension > exactness
+   - May be implemented later with smart boundary detection
 
 **Properties**:
-- Segment Size: The number of units (words or characters) per segment
-- Type: Word-based or Character-based
+- Segment Size: The number of words per segment
+- Type: Currently only WORD_BASED
+
+**Business Rule**: **Comprehension always wins.** No segmentation strategy should break words in ways that harm readability.
 
 ---
 

@@ -115,81 +115,8 @@ describe('ChunkingService', () => {
 	});
 
 	describe('chunkByCharacters()', () => {
-		it('should chunk by exact character count', () => {
-			const text = 'Hello world';
-			const sequence = ChunkingService.chunkByCharacters(text, 5);
-
-			expect(sequence.length).toBe(3);
-			expect(sequence.getChunk(0)?.content).toBe('Hello');
-			expect(sequence.getChunk(1)?.content).toBe(' worl');
-			expect(sequence.getChunk(2)?.content).toBe('d');
-		});
-
-		it('should split words mid-character if needed', () => {
-			const text = 'abcdefghij';
-			const sequence = ChunkingService.chunkByCharacters(text, 3);
-
-			expect(sequence.length).toBe(4);
-			expect(sequence.getChunk(0)?.content).toBe('abc');
-			expect(sequence.getChunk(1)?.content).toBe('def');
-			expect(sequence.getChunk(2)?.content).toBe('ghi');
-			expect(sequence.getChunk(3)?.content).toBe('j');
-		});
-
-		it('should handle last chunk with fewer characters', () => {
-			const text = 'Hello';
-			const sequence = ChunkingService.chunkByCharacters(text, 3);
-
-			expect(sequence.length).toBe(2);
-			expect(sequence.getChunk(0)?.content).toBe('Hel');
-			expect(sequence.getChunk(1)?.content).toBe('lo');
-		});
-
-		it('should include whitespace in character count', () => {
-			const text = 'A B C D';
-			const sequence = ChunkingService.chunkByCharacters(text, 2);
-
-			expect(sequence.length).toBe(4);
-			expect(sequence.getChunk(0)?.content).toBe('A ');
-			expect(sequence.getChunk(1)?.content).toBe('B ');
-			expect(sequence.getChunk(2)?.content).toBe('C ');
-			expect(sequence.getChunk(3)?.content).toBe('D');
-		});
-
-		it('should handle special characters', () => {
-			const text = 'Hello, world!';
-			const sequence = ChunkingService.chunkByCharacters(text, 7);
-
-			expect(sequence.length).toBe(2);
-			expect(sequence.getChunk(0)?.content).toBe('Hello, ');
-			expect(sequence.getChunk(1)?.content).toBe('world!');
-		});
-
-		it('should handle newlines', () => {
-			const text = 'Line1\nLine2';
-			const sequence = ChunkingService.chunkByCharacters(text, 6);
-
-			expect(sequence.length).toBe(2);
-			expect(sequence.getChunk(0)?.content).toBe('Line1\n');
-			expect(sequence.getChunk(1)?.content).toBe('Line2');
-		});
-
-		it('should return empty sequence for empty text', () => {
-			const sequence = ChunkingService.chunkByCharacters('', 5);
-			expect(sequence.isEmpty).toBe(true);
-		});
-
-		it('should reject non-positive character count', () => {
-			expect(() => ChunkingService.chunkByCharacters('Hello', 0)).toThrow('Character count must be positive');
-			expect(() => ChunkingService.chunkByCharacters('Hello', -1)).toThrow('Character count must be positive');
-		});
-
-		it('should handle single character text', () => {
-			const text = 'A';
-			const sequence = ChunkingService.chunkByCharacters(text, 1);
-
-			expect(sequence.length).toBe(1);
-			expect(sequence.getChunk(0)?.content).toBe('A');
+		it('should throw error - not yet supported', () => {
+			expect(() => ChunkingService.chunkByCharacters('Hello world', 5)).toThrow('not yet supported');
 		});
 	});
 
@@ -204,15 +131,9 @@ describe('ChunkingService', () => {
 			expect(sequence.getChunk(1)?.content).toBe('brown fox');
 		});
 
-		it('should use character-based chunking for character strategy', () => {
+		it('should throw for character-based strategy', () => {
 			const text = 'Hello world';
-			const strategy = ChunkingStrategy.characterBased(5);
-			const sequence = ChunkingService.chunk(text, strategy);
-
-			expect(sequence.length).toBe(3);
-			expect(sequence.getChunk(0)?.content).toBe('Hello');
-			expect(sequence.getChunk(1)?.content).toBe(' worl');
-			expect(sequence.getChunk(2)?.content).toBe('d');
+			expect(() => ChunkingStrategy.characterBased(5)).toThrow('not yet supported');
 		});
 	});
 
@@ -225,18 +146,6 @@ describe('ChunkingService', () => {
 			const reconstructed = sequence.chunks
 				.map(chunk => chunk.content)
 				.join(' ');
-
-			expect(reconstructed).toBe(text);
-		});
-
-		it('should not lose any characters during character-based chunking', () => {
-			const text = 'Hello, world! This is a test.';
-			const sequence = ChunkingService.chunkByCharacters(text, 7);
-
-			// Reconstruct text from chunks
-			const reconstructed = sequence.chunks
-				.map(chunk => chunk.content)
-				.join('');
 
 			expect(reconstructed).toBe(text);
 		});

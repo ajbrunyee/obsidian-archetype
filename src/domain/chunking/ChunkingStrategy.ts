@@ -29,9 +29,11 @@ export class ChunkingStrategy {
 	/**
 	 * Create a character-based chunking strategy
 	 * @param charCount Number of characters per chunk
+	 * @deprecated Character-based chunking is not yet implemented. Use wordBased() instead.
+	 * @throws Error - Character-based chunking violates comprehension principle
 	 */
 	static characterBased(charCount: number): ChunkingStrategy {
-		return new ChunkingStrategy(ChunkingType.CHARACTER_BASED, charCount);
+		throw new Error('Character-based chunking is not yet supported. Use wordBased() for comprehension-focused segmentation.');
 	}
 
 	/**
