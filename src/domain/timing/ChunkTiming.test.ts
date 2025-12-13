@@ -99,15 +99,41 @@ describe('ChunkTiming', () => {
 			expect(duration).toBeGreaterThanOrEqual(MIN_DISPLAY_DURATION);
 		});
 
-		it('should handle chunk with punctuation', () => {
-			const speed = ReadingSpeed.fromWPM(300);
-			const timing = new ChunkTiming(speed);
-			const chunk = new Chunk('Hello, world!', 0); // 2 words
+	it('should handle chunk with punctuation', () => {
+		const speed = ReadingSpeed.fromWPM(300);
+		const timing = new ChunkTiming(speed);
+		const chunk = new Chunk('Hello, world', 0); // 2 words, no sentence ending
 
-			// At 300 WPM: (2/300) * 60000 = 400ms
-			const duration = timing.calculateDuration(chunk);
-			expect(duration).toBe(400);
-		});
+		// At 300 WPM: (2/300) * 60000 = 400ms
+		const duration = timing.calculateDuration(chunk);
+		expect(duration).toBe(400);
+	});
+
+	it('should apply longer pause at sentence boundaries', () => {
+		const speed = ReadingSpeed.fromWPM(300);
+		const timing = new ChunkTiming(speed);
+		
+		// Test with period
+		const chunkWithPeriod = new Chunk('Hello world.', 0);
+		const durationWithPeriod = timing.calculateDuration(chunkWithPeriod);
+		// At 300 WPM: (2/300) * 60000 * 3.0 = 1200ms
+		expect(durationWithPeriod).toBe(1200);
+
+		// Test with exclamation
+		const chunkWithExclamation = new Chunk('Hello world!', 0);
+		const durationWithExclamation = timing.calculateDuration(chunkWithExclamation);
+		expect(durationWithExclamation).toBe(1200);
+
+		// Test with question mark
+		const chunkWithQuestion = new Chunk('Hello world?', 0);
+		const durationWithQuestion = timing.calculateDuration(chunkWithQuestion);
+		expect(durationWithQuestion).toBe(1200);
+
+		// Test without sentence ending
+		const chunkWithoutEnding = new Chunk('Hello world', 0);
+		const durationWithoutEnding = timing.calculateDuration(chunkWithoutEnding);
+		expect(durationWithoutEnding).toBe(400); // No multiplier
+	});
 	});
 
 	describe('formula verification', () => {
