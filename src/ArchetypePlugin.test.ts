@@ -79,26 +79,17 @@ describe('ArchetypePlugin', () => {
 			expect(loadSettingsSpy).toHaveBeenCalled();
 		});
 
-		it('should register commands', async () => {
+		it('should register speed reading command', async () => {
 			plugin.addCommand = vi.fn();
 			
 			await plugin.onload();
 			
 			expect(plugin.addCommand).toHaveBeenCalled();
-			expect(plugin.addCommand).toHaveBeenCalledTimes(3);
-		});
-
-		it('should add ribbon icon', async () => {
-			plugin.addRibbonIcon = vi.fn().mockReturnValue({
-				addClass: vi.fn(),
-			});
-			
-			await plugin.onload();
-			
-			expect(plugin.addRibbonIcon).toHaveBeenCalledWith(
-				'dice',
-				'Sample Plugin',
-				expect.any(Function)
+			expect(plugin.addCommand).toHaveBeenCalledWith(
+				expect.objectContaining({
+					id: 'start-speed-reading',
+					name: 'Start speed reading',
+				})
 			);
 		});
 
