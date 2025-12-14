@@ -15,7 +15,8 @@ describe('PunctuationStrippingMatchStrategy', () => {
 		it('should match text with quotes', () => {
 			expect(strategy.matches('domain', '"domain"')).toBe(true);
 			expect(strategy.matches('domain', "'domain'")).toBe(true);
-			expect(strategy.matches('domain', '"domain"')).toBe(true); // Curly quotes
+			// Use Unicode escape sequences for curly quotes (U+201C and U+201D)
+			expect(strategy.matches('domain', '\u201Cdomain\u201D')).toBe(true); // Curly quotes
 		});
 
 		it('should match text with periods', () => {
