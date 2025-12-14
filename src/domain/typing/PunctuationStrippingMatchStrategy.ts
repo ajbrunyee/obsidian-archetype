@@ -29,7 +29,8 @@ export class PunctuationStrippingMatchStrategy implements MatchStrategy {
 	private stripPunctuation(text: string): string {
 		// Remove: quotes (single, double, curly), periods, commas, semicolons, colons,
 		// exclamation marks, question marks, hyphens, parentheses, brackets, etc.
-		return text.replace(/['"'""\.,;:!?\-\(\)\[\]\{\}<>\/\\@#\$%\^&\*+=_`~|]/g, '');
+		// Unicode ranges for curly quotes: \u2018-\u201F covers all curly quotes and apostrophes
+		return text.replace(/['""\u2018-\u201F\.,;:!?\-\(\)\[\]\{\}<>\/\\@#\$%\^&\*+=_`~|]/g, '');
 	}
 }
 
