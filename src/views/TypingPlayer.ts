@@ -296,8 +296,10 @@ export class TypingPlayer {
 			target: JSON.stringify(target),
 			inputLength: input.length,
 			targetLength: target.length,
-			inputBytes: new TextEncoder().encode(input),
-			targetBytes: new TextEncoder().encode(target)
+			inputBytes: Array.from(new TextEncoder().encode(input)),
+			targetBytes: Array.from(new TextEncoder().encode(target)),
+			inputChars: Array.from(input).map((c, i) => `${i}:${c}(${c.charCodeAt(0)})`),
+			targetChars: Array.from(target).map((c, i) => `${i}:${c}(${c.charCodeAt(0)})`)
 		});
 		
 		try {
