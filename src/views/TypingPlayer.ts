@@ -18,10 +18,24 @@ export class TypingPlayer {
 	private feedbackEl: HTMLElement | null = null;
 	private progressEl: HTMLElement | null = null;
 	private statsEl: HTMLElement | null = null;
+	private attemptLog: Array<{
+		chunkIndex: number;
+		input: string;
+		target: string;
+		isMatch: boolean;
+		strategyName: string;
+		timestamp: number;
+	}> = [];
 
 	constructor(app: App, session: TypingSession) {
 		this.app = app;
 		this.session = session;
+		
+		// Log session start
+		console.log('🎯 Touch Typing Session Started', {
+			totalChunks: session.totalChunks,
+			startTime: new Date().toISOString()
+		});
 	}
 
 	/**
@@ -36,7 +50,21 @@ export class TypingPlayer {
 	 * Hide the overlay and cleanup
 	 */
 	hide(): void {
+		// Log session end
+		console.log('🛑 Touch Typing Session Ended', {
+			totalAttempts: this.attemptLog.length,
+			completed: this.session.isComplete,
+			duration: (this.session.sessionDuration / 1000).toFixed(1) + 's'
+		});
+		
 		this.removeOverlay();
+	}
+
+	/**
+	 * Get the attempt log for debugging
+	 */
+	getAttemptLog() {
+		return this.attemptLog;
 	}
 
 	/**
@@ -168,9 +196,48 @@ export class TypingPlayer {
 		}
 
 		const input = this.inputEl.value;
+		const currentChunk = this.session.currentChunk;
+		const target = currentChunk?.content || '';
+		
+		console.log('📝 Typing Attempt:', {
+			chunkIndex: this.session.currentIndex,
+			input: JSON.stringify(input),
+			target: JSON.stringify(target),
+			inputLength: input.length,
+			targetLength: target.length,
+			inputBytes: new TextEncoder().encode(input),
+			targetBytes: new TextEncoder().encode(target)
+		});
 		
 		try {
 			const match = this.session.submitInput(input);
+			
+			// Log the attempt
+			const logEntry = {
+				chunkIndex: this.session.currentIndex - (match.isMatch ? 1 : 0), // Adjust if advanced
+				input: input,
+				target: target,
+				isMatch: match.isMatch,
+				strategyName: match.strategyName,
+				timestamp: Date.now()
+			};
+			this.attemptLog.push(logEntry);
+			
+			// Detailed console log
+			console.log(match.isMatch ? '✅ Match Success' : '❌ Match Failed', {
+				input: JSON.stringify(input),
+				target: JSON.stringify(target),
+				strategyUsed: match.strategyName,
+				inputTrimmed: JSON.stringify(input.trim()),
+				targetTrimmed: JSON.stringify(target.trim()),
+				inputLowerCase: JSON.stringify(input.toLowerCase()),
+				targetLowerCase: JSON.stringify(target.toLowerCase()),
+				areEqual: input === target,
+				areTrimmedEqual: input.trim() === target.trim(),
+				areLowerCaseEqual: input.toLowerCase() === target.toLowerCase(),
+				areTrimmedLowerCaseEqual: input.trim().toLowerCase() === target.trim().toLowerCase()
+			});
+			
 			this.handleMatchResult(match);
 
 			// Clear input
@@ -186,6 +253,7 @@ export class TypingPlayer {
 				this.showCompletionScreen();
 			}
 		} catch (error) {
+			console.error('❌ Typing Error:', error);
 			this.showError(error instanceof Error ? error.message : 'An error occurred');
 		}
 	}
@@ -278,6 +346,30 @@ export class TypingPlayer {
 
 		const stats = this.session.getStatistics();
 
+		// Log session completion with full attempt log
+		console.log('🎉 Session Complete!', {
+			stats: {
+				accuracy: stats.accuracyRate.toFixed(1) + '%',
+				wpm: stats.averageWPM.toFixed(0),
+				cpm: stats.averageCPM.toFixed(0),
+				totalAttempts: stats.totalAttempts,
+				errors: stats.totalErrors,
+				duration: (this.session.sessionDuration / 1000).toFixed(1) + 's'
+			},
+			attemptLog: this.attemptLog
+		});
+		
+		// Also log a detailed breakdown of failures
+		const failures = this.attemptLog.filter(a => !a.isMatch);
+		if (failures.length > 0) {
+			console.log('❌ Failed Attempts Breakdown:', failures.map(f => ({
+				chunkIndex: f.chunkIndex,
+				input: JSON.stringify(f.input),
+				target: JSON.stringify(f.target),
+				timestamp: new Date(f.timestamp).toISOString()
+			})));
+		}
+
 		// Hide input
 		this.inputEl.style.display = 'none';
 
@@ -312,6 +404,9 @@ export class TypingPlayer {
 					</div>
 				</div>
 				<p class="archetype-typing-completion-message">Click anywhere or press Escape to close</p>
+				<p class="archetype-typing-completion-hint" style="font-size: 12px; color: var(--text-faint); margin-top: 1rem;">
+					Check the console (Cmd+Opt+I / Ctrl+Shift+I) for detailed attempt logs
+				</p>
 			</div>
 		`;
 
