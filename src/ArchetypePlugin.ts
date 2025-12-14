@@ -10,6 +10,11 @@ import { ReadingSpeed } from './domain/timing/ReadingSpeed';
 import { SegmentPlayer } from './views/SegmentPlayer';
 import { TypingPlayer } from './views/TypingPlayer';
 import { TypingSession } from './domain/typing/TypingSession';
+import { LenientMatchStrategy } from './domain/typing/LenientMatchStrategy';
+import { StrictMatchStrategy } from './domain/typing/StrictMatchStrategy';
+import { FuzzyMatchStrategy } from './domain/typing/FuzzyMatchStrategy';
+import { PunctuationStrippingMatchStrategy } from './domain/typing/PunctuationStrippingMatchStrategy';
+import { MatchStrategy } from './domain/typing/MatchStrategy';
 
 export class ArchetypePlugin extends Plugin {
 	settings: ArchetypeSettings;
@@ -78,20 +83,28 @@ export class ArchetypePlugin extends Plugin {
 					const strategy = ChunkingStrategy.wordBased(this.settings.typingChunkSize);
 					const sequence = ChunkingService.chunk(text, strategy);
 
-					// Create typing session with configured match strategy
-					let session: TypingSession;
+					// Create base match strategy based on setting
+					let matchStrategy: MatchStrategy;
 					switch (this.settings.typingMatchStrategy) {
 						case 'strict':
-							session = TypingSession.withStrictMatching(sequence);
+							matchStrategy = new StrictMatchStrategy();
 							break;
 						case 'fuzzy':
-							session = TypingSession.withFuzzyMatching(sequence, this.settings.typingFuzzyThreshold);
+							matchStrategy = new FuzzyMatchStrategy(this.settings.typingFuzzyThreshold);
 							break;
 						case 'lenient':
 						default:
-							session = TypingSession.withLenientMatching(sequence);
+							matchStrategy = new LenientMatchStrategy();
 							break;
 					}
+
+					// Wrap with punctuation stripping if enabled
+					if (this.settings.typingStripPunctuation) {
+						matchStrategy = new PunctuationStrippingMatchStrategy(matchStrategy);
+					}
+
+					// Create typing session with configured strategy
+					const session = new TypingSession(sequence, matchStrategy);
 
 					// Create and show player with settings access
 					const player = new TypingPlayer(this.app, session, this);

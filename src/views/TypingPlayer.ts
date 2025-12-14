@@ -211,6 +211,17 @@ export class TypingPlayer {
 		};
 		updateFuzzyVisibility();
 		strategySelect.addEventListener('change', updateFuzzyVisibility);
+
+		// Strip punctuation toggle
+		const punctuationControl = container.createEl('div', { cls: 'archetype-typing-control' });
+		punctuationControl.createEl('label', { text: 'Strip punctuation:' });
+		const punctuationCheckbox = punctuationControl.createEl('input', { type: 'checkbox' });
+		punctuationCheckbox.checked = this.plugin.settings.typingStripPunctuation;
+		punctuationCheckbox.addEventListener('change', async () => {
+			this.plugin.settings.typingStripPunctuation = punctuationCheckbox.checked;
+			await this.plugin.saveSettings();
+			console.log('⚙️ Setting updated: typingStripPunctuation =', punctuationCheckbox.checked);
+		});
 	}
 
 	/**

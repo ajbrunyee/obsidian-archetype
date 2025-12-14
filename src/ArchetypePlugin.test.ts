@@ -43,13 +43,14 @@ describe('ArchetypePlugin', () => {
 			
 			await plugin.loadSettings();
 			
-			expect(plugin.settings).toEqual({
-				speedReadingWPM: 300,
-				speedReadingChunkSize: 3,
-				typingChunkSize: 1,
-				typingMatchStrategy: 'lenient',
-				typingFuzzyThreshold: 2
-			});
+		expect(plugin.settings).toEqual({
+			speedReadingWPM: 300,
+			speedReadingChunkSize: 3,
+			typingChunkSize: 1,
+			typingMatchStrategy: 'lenient',
+			typingFuzzyThreshold: 2,
+			typingStripPunctuation: true
+		});
 		});
 
 	it('should merge loaded data with defaults', async () => {
@@ -61,6 +62,7 @@ describe('ArchetypePlugin', () => {
 		
 		expect(plugin.settings.typingChunkSize).toBe(5);
 		expect(plugin.settings.speedReadingWPM).toBe(300); // default
+		expect(plugin.settings.typingStripPunctuation).toBe(true); // default
 	});
 });
 
@@ -72,7 +74,8 @@ describe('saveSettings', () => {
 			speedReadingChunkSize: 3,
 			typingChunkSize: 2,
 			typingMatchStrategy: 'lenient',
-			typingFuzzyThreshold: 2
+			typingFuzzyThreshold: 2,
+			typingStripPunctuation: true
 		};
 		
 		await plugin.saveSettings();

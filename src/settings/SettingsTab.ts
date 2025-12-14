@@ -80,5 +80,15 @@ export class ArchetypeSettingsTab extends PluginSettingTab {
 					this.plugin.settings.typingFuzzyThreshold = value;
 					await this.plugin.saveSettings();
 				}));
+
+		new Setting(containerEl)
+			.setName('Strip punctuation')
+			.setDesc('Ignore punctuation when matching (quotes, periods, commas, etc.)')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.typingStripPunctuation)
+				.onChange(async (value) => {
+					this.plugin.settings.typingStripPunctuation = value;
+					await this.plugin.saveSettings();
+				}));
 	}
 }

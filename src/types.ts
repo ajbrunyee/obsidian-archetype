@@ -7,4 +7,5 @@ export interface ArchetypeSettings {
 	typingChunkSize: number;
 	typingMatchStrategy: 'lenient' | 'strict' | 'fuzzy';
 	typingFuzzyThreshold: number;
+	typingStripPunctuation: boolean;
 }
