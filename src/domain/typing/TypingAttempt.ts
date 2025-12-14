@@ -7,41 +7,33 @@ import { TypingMatch } from './TypingMatch';
  * Tracks both successful and unsuccessful attempts for statistics.
  */
 export class TypingAttempt {
-	readonly chunkIndex: number;
+	readonly match: TypingMatch;
+	readonly timestamp: number; // Unix timestamp in milliseconds
+	readonly duration: number; // milliseconds
+
+	// Derived convenience properties
 	readonly input: string;
 	readonly target: string;
 	readonly isCorrect: boolean;
-	readonly attemptNumber: number;
-	readonly duration: number; // milliseconds
-	readonly timestamp: Date;
-	readonly match: TypingMatch;
 
 	constructor(
-		chunkIndex: number,
 		match: TypingMatch,
-		attemptNumber: number,
-		duration: number,
-		timestamp: Date = new Date()
+		timestamp: number,
+		duration: number
 	) {
 		// Validation
-		if (chunkIndex < 0) {
-			throw new Error('Chunk index must be non-negative');
-		}
-		if (attemptNumber < 1) {
-			throw new Error('Attempt number must be positive (starts at 1)');
-		}
 		if (duration < 0) {
-			throw new Error('Duration must be non-negative');
+			throw new Error('Duration cannot be negative.');
 		}
 
-		this.chunkIndex = chunkIndex;
 		this.match = match;
+		this.timestamp = timestamp;
+		this.duration = duration;
+
+		// Derived from match
 		this.input = match.input;
 		this.target = match.target;
 		this.isCorrect = match.isMatch;
-		this.attemptNumber = attemptNumber;
-		this.duration = duration;
-		this.timestamp = timestamp;
 	}
 
 	/**
@@ -66,13 +58,11 @@ export class TypingAttempt {
 	 */
 	equals(other: TypingAttempt): boolean {
 		return (
-			this.chunkIndex === other.chunkIndex &&
 			this.input === other.input &&
 			this.target === other.target &&
 			this.isCorrect === other.isCorrect &&
-			this.attemptNumber === other.attemptNumber &&
 			this.duration === other.duration &&
-			this.timestamp.getTime() === other.timestamp.getTime()
+			this.timestamp === other.timestamp
 		);
 	}
 }
