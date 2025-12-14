@@ -8,6 +8,8 @@ import { ChunkProgression } from './domain/progression/ChunkProgression';
 import { ChunkTiming } from './domain/timing/ChunkTiming';
 import { ReadingSpeed } from './domain/timing/ReadingSpeed';
 import { SegmentPlayer } from './views/SegmentPlayer';
+import { TypingPlayer } from './views/TypingPlayer';
+import { TypingSession } from './domain/typing/TypingSession';
 
 export class ArchetypePlugin extends Plugin {
 	settings: ArchetypeSettings;
@@ -50,6 +52,42 @@ export class ArchetypePlugin extends Plugin {
 				} catch (error) {
 					new Notice(`Error: ${error.message}`);
 					console.error('Speed reading error:', error);
+				}
+			}
+		});
+
+		// Add touch typing command
+		this.addCommand({
+			id: 'start-touch-typing',
+			name: 'Start touch typing',
+			editorCallback: (editor: Editor, _view: MarkdownView) => {
+				// Use selection if available, otherwise use entire document
+				let text = editor.getSelection();
+				
+				if (!text || text.trim().length === 0) {
+					text = editor.getValue();
+				}
+				
+				if (!text || text.trim().length === 0) {
+					new Notice('No text to type');
+					return;
+				}
+
+				try {
+					// Create chunks from text (word-based, 3-5 words per chunk)
+					const strategy = ChunkingStrategy.wordBased(4);
+					const sequence = ChunkingService.chunk(text, strategy);
+
+					// Create typing session with lenient matching (case-insensitive)
+					const session = TypingSession.withLenientMatching(sequence);
+
+					// Create and show player
+					const player = new TypingPlayer(this.app, session);
+					player.show();
+
+				} catch (error) {
+					new Notice(`Error: ${error.message}`);
+					console.error('Touch typing error:', error);
 				}
 			}
 		});
