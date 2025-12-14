@@ -96,6 +96,23 @@ describe('TypingSession', () => {
         });
     });
 
+    describe('matchStrategy getter', () => {
+        it('should expose the match strategy', () => {
+            const session = new TypingSession(chunks);
+            
+            expect(session.matchStrategy).toBeDefined();
+            expect(session.matchStrategy.name).toBe('lenient');
+        });
+
+        it('should expose custom strategy', () => {
+            const strictStrategy = new StrictMatchStrategy();
+            const session = new TypingSession(chunks, strictStrategy);
+            
+            expect(session.matchStrategy).toBe(strictStrategy);
+            expect(session.matchStrategy.name).toBe('strict');
+        });
+    });
+
     describe('start', () => {
         it('should transition from IDLE to AWAITING_INPUT', () => {
             const session = new TypingSession(chunks);

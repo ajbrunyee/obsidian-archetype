@@ -268,13 +268,30 @@ export class TypingPlayer {
 	}
 
 	/**
-	 * Handle input field changes (for real-time feedback)
+	 * Handle input field changes (for real-time feedback and auto-advance)
 	 */
 	private handleInput(): void {
-		// Clear feedback on new input
-		if (this.feedbackEl) {
-			this.feedbackEl.textContent = '';
-			this.feedbackEl.className = 'archetype-typing-feedback';
+		if (!this.inputEl || this.session.state !== TypingSessionState.AWAITING_INPUT) {
+			return;
+		}
+
+		const input = this.inputEl.value;
+		const currentChunk = this.session.currentChunk;
+		if (!currentChunk) return;
+
+		// Check if input matches in real-time
+		const matchStrategy = this.session.matchStrategy;
+		const isMatch = matchStrategy.matches(input, currentChunk.content);
+
+		// Auto-advance when correct
+		if (isMatch) {
+			this.submitInput();
+		} else {
+			// Clear feedback while typing
+			if (this.feedbackEl) {
+				this.feedbackEl.textContent = '';
+				this.feedbackEl.className = 'archetype-typing-feedback';
+			}
 		}
 	}
 

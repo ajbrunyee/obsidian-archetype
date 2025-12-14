@@ -128,6 +128,10 @@ export class TypingSession {
         return Date.now() - this._startTime;
     }
 
+    get matchStrategy(): MatchStrategy {
+        return this.strategy;
+    }
+
     // ===== Commands =====
 
     /**
