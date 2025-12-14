@@ -44,31 +44,42 @@ describe('ArchetypePlugin', () => {
 			await plugin.loadSettings();
 			
 			expect(plugin.settings).toEqual({
-				mySetting: 'default',
+				speedReadingWPM: 300,
+				speedReadingChunkSize: 3,
+				typingChunkSize: 1,
+				typingMatchStrategy: 'lenient',
+				typingFuzzyThreshold: 2
 			});
 		});
 
-		it('should merge loaded data with defaults', async () => {
-			plugin.loadData = vi.fn().mockResolvedValue({
-				mySetting: 'custom value',
-			});
-			
-			await plugin.loadSettings();
-			
-			expect(plugin.settings.mySetting).toBe('custom value');
+	it('should merge loaded data with defaults', async () => {
+		plugin.loadData = vi.fn().mockResolvedValue({
+			typingChunkSize: 5,
 		});
+		
+		await plugin.loadSettings();
+		
+		expect(plugin.settings.typingChunkSize).toBe(5);
+		expect(plugin.settings.speedReadingWPM).toBe(300); // default
 	});
+});
 
-	describe('saveSettings', () => {
-		it('should call saveData with settings', async () => {
-			plugin.saveData = vi.fn().mockResolvedValue(undefined);
-			plugin.settings = { mySetting: 'test' };
-			
-			await plugin.saveSettings();
-			
-			expect(plugin.saveData).toHaveBeenCalledWith({ mySetting: 'test' });
-		});
+describe('saveSettings', () => {
+	it('should call saveData with settings', async () => {
+		plugin.saveData = vi.fn().mockResolvedValue(undefined);
+		plugin.settings = {
+			speedReadingWPM: 400,
+			speedReadingChunkSize: 3,
+			typingChunkSize: 2,
+			typingMatchStrategy: 'lenient',
+			typingFuzzyThreshold: 2
+		};
+		
+		await plugin.saveSettings();
+		
+		expect(plugin.saveData).toHaveBeenCalledWith(plugin.settings);
 	});
+});
 
 	describe('onload', () => {
 		it('should load settings on plugin load', async () => {

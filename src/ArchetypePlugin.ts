@@ -35,12 +35,12 @@ export class ArchetypePlugin extends Plugin {
 				}
 
 				try {
-					// Create segments from text (word-based, 3 words per segment)
-					const strategy = ChunkingStrategy.wordBased(3);
+					// Create segments from text (word-based, configured chunk size)
+					const strategy = ChunkingStrategy.wordBased(this.settings.speedReadingChunkSize);
 					const sequence = ChunkingService.chunk(text, strategy);
 
-					// Setup timing (300 WPM - normal speed)
-					const timing = new ChunkTiming(ReadingSpeed.NORMAL);
+					// Setup timing (use configured WPM)
+					const timing = new ChunkTiming(ReadingSpeed.fromWPM(this.settings.speedReadingWPM));
 
 					// Create progression
 					const progression = new ChunkProgression(sequence);
@@ -74,15 +74,27 @@ export class ArchetypePlugin extends Plugin {
 				}
 
 				try {
-					// Create chunks from text (word-based, 3-5 words per chunk)
-					const strategy = ChunkingStrategy.wordBased(4);
+					// Create chunks from text using configured chunk size
+					const strategy = ChunkingStrategy.wordBased(this.settings.typingChunkSize);
 					const sequence = ChunkingService.chunk(text, strategy);
 
-					// Create typing session with lenient matching (case-insensitive)
-					const session = TypingSession.withLenientMatching(sequence);
+					// Create typing session with configured match strategy
+					let session: TypingSession;
+					switch (this.settings.typingMatchStrategy) {
+						case 'strict':
+							session = TypingSession.withStrictMatching(sequence);
+							break;
+						case 'fuzzy':
+							session = TypingSession.withFuzzyMatching(sequence, this.settings.typingFuzzyThreshold);
+							break;
+						case 'lenient':
+						default:
+							session = TypingSession.withLenientMatching(sequence);
+							break;
+					}
 
-					// Create and show player
-					const player = new TypingPlayer(this.app, session);
+					// Create and show player with settings access
+					const player = new TypingPlayer(this.app, session, this);
 					player.show();
 
 				} catch (error) {

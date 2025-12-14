@@ -1,4 +1,10 @@
 export interface ArchetypeSettings {
-	mySetting: string;
+	// Speed Reading Settings
+	speedReadingWPM: number;
+	speedReadingChunkSize: number;
+	
+	// Touch Typing Settings
+	typingChunkSize: number;
+	typingMatchStrategy: 'lenient' | 'strict' | 'fuzzy';
+	typingFuzzyThreshold: number;
 }
-

@@ -137,6 +137,53 @@
 	padding: 0.5rem;
 }
 
+/* Controls panel */
+.archetype-typing-controls {
+	margin-top: 1.5rem;
+	padding: 1rem;
+	background-color: var(--background-secondary);
+	border-radius: 8px;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.archetype-typing-controls-title {
+	font-size: 12px;
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: 0.5rem;
+}
+
+.archetype-typing-control {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.archetype-typing-control label {
+	font-size: 13px;
+	color: var(--text-normal);
+	flex-shrink: 0;
+}
+
+.archetype-typing-control input[type="range"] {
+	flex-grow: 1;
+	max-width: 200px;
+}
+
+.archetype-typing-control select {
+	flex-grow: 1;
+	max-width: 200px;
+	padding: 0.25rem 0.5rem;
+	border-radius: 4px;
+	background-color: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	color: var(--text-normal);
+}
+
 /* Help text */
 .archetype-typing-help {
 	font-size: 12px;

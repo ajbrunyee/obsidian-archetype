@@ -2,6 +2,7 @@ import { App } from 'obsidian';
 import { TypingSession } from '../domain/typing/TypingSession';
 import { TypingSessionState } from '../domain/typing/TypingSessionState';
 import { TypingMatch } from '../domain/typing/TypingMatch';
+import { ArchetypePlugin } from '../ArchetypePlugin';
 
 /**
  * TypingPlayer - View Component
@@ -12,12 +13,14 @@ import { TypingMatch } from '../domain/typing/TypingMatch';
 export class TypingPlayer {
 	private app: App;
 	private session: TypingSession;
+	private plugin: ArchetypePlugin;
 	private overlayEl: HTMLElement | null = null;
 	private displayEl: HTMLElement | null = null;
 	private inputEl: HTMLInputElement | null = null;
 	private feedbackEl: HTMLElement | null = null;
 	private progressEl: HTMLElement | null = null;
 	private statsEl: HTMLElement | null = null;
+	private controlsEl: HTMLElement | null = null;
 	private attemptLog: Array<{
 		chunkIndex: number;
 		input: string;
@@ -27,13 +30,16 @@ export class TypingPlayer {
 		timestamp: number;
 	}> = [];
 
-	constructor(app: App, session: TypingSession) {
+	constructor(app: App, session: TypingSession, plugin: ArchetypePlugin) {
 		this.app = app;
 		this.session = session;
+		this.plugin = plugin;
 		
 		// Log session start
 		console.log('🎯 Touch Typing Session Started', {
 			totalChunks: session.totalChunks,
+			chunkSize: plugin.settings.typingChunkSize,
+			matchStrategy: plugin.settings.typingMatchStrategy,
 			startTime: new Date().toISOString()
 		});
 	}
@@ -110,6 +116,12 @@ export class TypingPlayer {
 		this.statsEl.addClass('archetype-typing-stats');
 		container.appendChild(this.statsEl);
 
+		// Controls panel
+		this.controlsEl = document.createElement('div');
+		this.controlsEl.addClass('archetype-typing-controls');
+		this.createControls(this.controlsEl);
+		container.appendChild(this.controlsEl);
+
 		// Help text
 		const helpEl = document.createElement('div');
 		helpEl.addClass('archetype-typing-help');
@@ -131,6 +143,74 @@ export class TypingPlayer {
 
 		// Focus input
 		this.inputEl.focus();
+	}
+
+	/**
+	 * Create control panel for in-session adjustments
+	 */
+	private createControls(container: HTMLElement): void {
+		const controlsTitle = container.createEl('div', {
+			text: 'Settings (apply on next session)',
+			cls: 'archetype-typing-controls-title'
+		});
+
+		// Chunk size control
+		const chunkSizeControl = container.createEl('div', { cls: 'archetype-typing-control' });
+		chunkSizeControl.createEl('label', { text: `Words per chunk: ${this.plugin.settings.typingChunkSize}` });
+		const chunkSizeSlider = chunkSizeControl.createEl('input', { type: 'range' });
+		chunkSizeSlider.min = '1';
+		chunkSizeSlider.max = '10';
+		chunkSizeSlider.value = this.plugin.settings.typingChunkSize.toString();
+		chunkSizeSlider.addEventListener('input', async () => {
+			const value = parseInt(chunkSizeSlider.value);
+			this.plugin.settings.typingChunkSize = value;
+			await this.plugin.saveSettings();
+			chunkSizeControl.querySelector('label')!.textContent = `Words per chunk: ${value}`;
+			console.log('⚙️ Setting updated: typingChunkSize =', value);
+		});
+
+		// Match strategy control
+		const strategyControl = container.createEl('div', { cls: 'archetype-typing-control' });
+		strategyControl.createEl('label', { text: 'Match strategy:' });
+		const strategySelect = strategyControl.createEl('select');
+		[
+			{ value: 'lenient', label: 'Lenient (recommended)' },
+			{ value: 'strict', label: 'Strict (exact match)' },
+			{ value: 'fuzzy', label: 'Fuzzy (allow typos)' }
+		].forEach(opt => {
+			const option = strategySelect.createEl('option', { value: opt.value, text: opt.label });
+			if (opt.value === this.plugin.settings.typingMatchStrategy) {
+				option.selected = true;
+			}
+		});
+		strategySelect.addEventListener('change', async () => {
+			const value = strategySelect.value as 'lenient' | 'strict' | 'fuzzy';
+			this.plugin.settings.typingMatchStrategy = value;
+			await this.plugin.saveSettings();
+			console.log('⚙️ Setting updated: typingMatchStrategy =', value);
+		});
+
+		// Fuzzy threshold control (only show if fuzzy selected)
+		const fuzzyControl = container.createEl('div', { cls: 'archetype-typing-control' });
+		fuzzyControl.createEl('label', { text: `Max typos (fuzzy): ${this.plugin.settings.typingFuzzyThreshold}` });
+		const fuzzySlider = fuzzyControl.createEl('input', { type: 'range' });
+		fuzzySlider.min = '1';
+		fuzzySlider.max = '5';
+		fuzzySlider.value = this.plugin.settings.typingFuzzyThreshold.toString();
+		fuzzySlider.addEventListener('input', async () => {
+			const value = parseInt(fuzzySlider.value);
+			this.plugin.settings.typingFuzzyThreshold = value;
+			await this.plugin.saveSettings();
+			fuzzyControl.querySelector('label')!.textContent = `Max typos (fuzzy): ${value}`;
+			console.log('⚙️ Setting updated: typingFuzzyThreshold =', value);
+		});
+
+		// Toggle fuzzy control visibility
+		const updateFuzzyVisibility = () => {
+			fuzzyControl.style.display = this.plugin.settings.typingMatchStrategy === 'fuzzy' ? 'flex' : 'none';
+		};
+		updateFuzzyVisibility();
+		strategySelect.addEventListener('change', updateFuzzyVisibility);
 	}
 
 	/**
