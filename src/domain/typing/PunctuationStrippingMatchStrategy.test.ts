@@ -176,6 +176,18 @@ describe('PunctuationStrippingMatchStrategy', () => {
 		const baseStrategy = new LenientMatchStrategy();
 		const strategy = new PunctuationStrippingMatchStrategy(baseStrategy);
 
+		it('should match text from Essay-DDD.md with curly quotes', () => {
+			// This is the actual text from src/test-data/Essay-DDD.md line 6
+			// The word "domain" appears with Unicode curly quotes (U+201C and U+201D)
+			const target = 'The term "domain" in this context refers to the sphere of knowledge';
+			
+			// User should be able to type just: domain
+			expect(strategy.matches('The term domain in this context refers to the sphere of knowledge', target)).toBe(true);
+			
+			// Or just the word itself
+			expect(strategy.matches('domain', '"domain"')).toBe(true);
+		});
+
 		it('should match markdown quoted text', () => {
 			expect(strategy.matches('domain', '`domain`')).toBe(true);
 			expect(strategy.matches('code', '```code```')).toBe(true);
