@@ -24,13 +24,23 @@ export class PunctuationStrippingMatchStrategy implements MatchStrategy {
 
 	/**
 	 * Remove common punctuation marks from text
-	 * Keeps only letters, numbers, and whitespace
+	 * Punctuation that can separate words (dashes, slashes) is replaced with spaces
+	 * Other punctuation is simply removed
+	 * Multiple spaces are normalized to single spaces
 	 */
 	private stripPunctuation(text: string): string {
-		// Remove: quotes (single, double, curly), periods, commas, semicolons, colons,
-		// exclamation marks, question marks, hyphens, parentheses, brackets, etc.
-		// Unicode ranges for curly quotes: \u2018-\u201F covers all curly quotes and apostrophes
-		return text.replace(/['""\u2018-\u201F\.,;:!?\-\(\)\[\]\{\}<>\/\\@#\$%\^&\*+=_`~|]/g, '');
+		// First, replace word-separating punctuation with spaces
+		// Includes: em dash (U+2014), en dash (U+2013), hyphens, slashes
+		let cleaned = text.replace(/[\u2013\u2014\-\/\\]/g, ' ');
+		
+		// Then remove other punctuation
+		// Includes: quotes (straight and curly U+2018-U+201F), periods, commas, etc.
+		cleaned = cleaned.replace(/['""\u2018-\u201F\.,;:!?\(\)\[\]\{\}<>@#\$%\^&\*+=_`~|]/g, '');
+		
+		// Normalize whitespace: multiple spaces → single space, trim edges
+		cleaned = cleaned.replace(/\s+/g, ' ').trim();
+		
+		return cleaned;
 	}
 }
 

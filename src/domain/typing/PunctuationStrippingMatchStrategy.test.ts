@@ -36,10 +36,17 @@ describe('PunctuationStrippingMatchStrategy', () => {
 			expect(strategy.matches('value', '{value}')).toBe(true);
 		});
 
-		it('should match text with hyphens', () => {
-			// Hyphens are stripped, so hyphenated words become one word
-			expect(strategy.matches('helloworld', 'hello-world')).toBe(true);
-			expect(strategy.matches('selfaware', 'self-aware')).toBe(true);
+		it('should match text with hyphens replaced by spaces', () => {
+			// Hyphens are replaced with spaces to preserve word boundaries
+			expect(strategy.matches('hello world', 'hello-world')).toBe(true);
+			expect(strategy.matches('self aware', 'self-aware')).toBe(true);
+		});
+
+		it('should match text with em dash and en dash', () => {
+			// Em dash (U+2014) and en dash (U+2013) are replaced with spaces
+			expect(strategy.matches('models where', 'models\u2014where')).toBe(true); // em dash
+			expect(strategy.matches('models where', 'models\u2013where')).toBe(true); // en dash
+			expect(strategy.matches('hello world test', 'hello\u2014world\u2014test')).toBe(true);
 		});
 
 		it('should match text with apostrophes', () => {
@@ -57,10 +64,10 @@ describe('PunctuationStrippingMatchStrategy', () => {
 			expect(strategy.matches('statement', 'statement;')).toBe(true);
 		});
 
-		it('should match text with slashes', () => {
-			// Slashes are stripped
-			expect(strategy.matches('andor', 'and/or')).toBe(true);
-			expect(strategy.matches('pathfile', 'path\\file')).toBe(true);
+		it('should match text with slashes replaced by spaces', () => {
+			// Slashes are replaced with spaces to preserve word boundaries
+			expect(strategy.matches('and or', 'and/or')).toBe(true);
+			expect(strategy.matches('path file', 'path\\file')).toBe(true);
 		});
 
 		it('should match text with special characters', () => {
@@ -112,9 +119,12 @@ describe('PunctuationStrippingMatchStrategy', () => {
 			expect(strategy.matches('domain', '"Domain"')).toBe(false);
 		});
 
-		it('should preserve whitespace sensitivity', () => {
+		it('should normalize whitespace during stripping', () => {
+			// Edge spaces are trimmed
 			expect(strategy.matches('hello', '"hello"')).toBe(true);
-			expect(strategy.matches('hello ', '"hello"')).toBe(false); // Extra space
+			expect(strategy.matches('hello', ' "hello" ')).toBe(true);
+			// Multiple internal spaces are normalized to single spaces
+			expect(strategy.matches('hello world', '"hello  world"')).toBe(true); // Double space normalized
 		});
 
 		it('should strip punctuation but keep strict matching', () => {
