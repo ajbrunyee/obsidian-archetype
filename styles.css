@@ -53,20 +53,42 @@
 	width: 100vw;
 	height: 100vh;
 	z-index: 9999;
-	background-color: var(--background-primary);
+	background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent to show it's dismissible */
+	backdrop-filter: blur(4px);
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	/* Prevent text selection on tap outside */
+	-webkit-user-select: none;
+	user-select: none;
 }
 
 /* Container for all typing UI elements */
 .archetype-typing-container {
-	width: 80vw;
+	width: 90vw;
 	max-width: 800px;
+	max-height: 90vh;
+	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
-	gap: 2rem;
-	padding: 2rem;
+	gap: 1.5rem;
+	padding: 1.5rem;
+	background-color: var(--background-primary);
+	border-radius: 12px;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+	/* Re-enable text selection inside container */
+	-webkit-user-select: text;
+	user-select: text;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+	.archetype-typing-container {
+		width: 95vw;
+		padding: 1rem;
+		gap: 1rem;
+		max-height: 95vh;
+	}
 }
 
 /* Progress bar at top */
@@ -104,11 +126,31 @@
 	color: var(--text-normal);
 	text-align: center;
 	transition: border-color 0.2s;
+	/* Mobile optimization */
+	-webkit-appearance: none;
+	appearance: none;
+	touch-action: manipulation;
 }
 
 .archetype-typing-input:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
+}
+
+/* Mobile: Larger touch targets and text */
+@media (max-width: 768px) {
+	.archetype-typing-display {
+		font-size: 24px;
+		padding: 1.5rem;
+		min-height: 100px;
+	}
+	
+	.archetype-typing-input {
+		font-size: 20px;
+		padding: 0.875rem;
+		/* Prevent zoom on focus in iOS */
+		font-size: max(16px, 20px);
+	}
 }
 
 /* Feedback display */
@@ -161,6 +203,7 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: 1rem;
+	min-height: 44px; /* Touch-friendly tap target */
 }
 
 .archetype-typing-control label {
@@ -172,22 +215,28 @@
 .archetype-typing-control input[type="range"] {
 	flex-grow: 1;
 	max-width: 200px;
+	min-height: 44px; /* Touch-friendly */
 }
 
 .archetype-typing-control select {
 	flex-grow: 1;
 	max-width: 200px;
-	padding: 0.25rem 0.5rem;
+	padding: 0.5rem;
 	border-radius: 4px;
 	background-color: var(--background-primary);
 	border: 1px solid var(--background-modifier-border);
 	color: var(--text-normal);
+	min-height: 44px; /* Touch-friendly */
+	font-size: max(16px, 13px); /* Prevent zoom on iOS */
 }
 
 .archetype-typing-control input[type="checkbox"] {
-	width: 18px;
-	height: 18px;
+	width: 24px;
+	height: 24px;
 	cursor: pointer;
+	/* Touch-friendly size */
+	min-width: 24px;
+	min-height: 24px;
 }
 
 /* Help text */
@@ -195,7 +244,27 @@
 	font-size: 12px;
 	color: var(--text-faint);
 	text-align: center;
-	margin-top: 1rem;
+	margin-top: 0.5rem;
+	padding: 0.5rem;
+}
+
+/* Mobile: Stack controls vertically on small screens */
+@media (max-width: 480px) {
+	.archetype-typing-control {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.5rem;
+	}
+	
+	.archetype-typing-control input[type="range"],
+	.archetype-typing-control select {
+		max-width: 100%;
+	}
+	
+	.archetype-typing-controls {
+		margin-top: 1rem;
+		padding: 0.75rem;
+	}
 }
 
 /* Completion screen */

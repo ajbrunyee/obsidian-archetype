@@ -21,6 +21,7 @@ export class TypingPlayer {
 	private progressEl: HTMLElement | null = null;
 	private statsEl: HTMLElement | null = null;
 	private controlsEl: HTMLElement | null = null;
+	private boundKeydownHandler: ((e: KeyboardEvent) => void) | null = null;
 	private attemptLog: Array<{
 		chunkIndex: number;
 		input: string;
@@ -62,6 +63,12 @@ export class TypingPlayer {
 			completed: this.session.isComplete,
 			duration: (this.session.sessionDuration / 1000).toFixed(1) + 's'
 		});
+		
+		// Clean up global event listener
+		if (this.boundKeydownHandler) {
+			document.removeEventListener('keydown', this.boundKeydownHandler);
+			this.boundKeydownHandler = null;
+		}
 		
 		this.removeOverlay();
 	}
@@ -125,12 +132,28 @@ export class TypingPlayer {
 		// Help text
 		const helpEl = document.createElement('div');
 		helpEl.addClass('archetype-typing-help');
-		helpEl.textContent = 'Press Escape to exit';
+		helpEl.textContent = 'Press Escape or tap outside to exit';
 		container.appendChild(helpEl);
 
-		// Event handlers
-		this.inputEl.addEventListener('keydown', (e) => this.handleKeyDown(e));
+		// Event handlers for input
+		this.inputEl.addEventListener('keydown', (e) => this.handleInputKeyDown(e));
 		this.inputEl.addEventListener('input', () => this.handleInput());
+
+		// Global event handlers
+		this.boundKeydownHandler = (e: KeyboardEvent) => this.handleGlobalKeyDown(e);
+		document.addEventListener('keydown', this.boundKeydownHandler);
+
+		// Click outside to dismiss
+		this.overlayEl.addEventListener('click', (e) => {
+			if (e.target === this.overlayEl) {
+				this.hide();
+			}
+		});
+
+		// Prevent clicks inside container from dismissing
+		container.addEventListener('click', (e) => {
+			e.stopPropagation();
+		});
 
 		// Assemble
 		this.overlayEl.appendChild(container);
@@ -252,19 +275,24 @@ export class TypingPlayer {
 	}
 
 	/**
-	 * Handle keyboard input
+	 * Handle global keyboard events (e.g., Escape from anywhere)
 	 */
-	private handleKeyDown(e: KeyboardEvent): void {
+	private handleGlobalKeyDown(e: KeyboardEvent): void {
 		if (e.key === 'Escape') {
 			e.preventDefault();
 			this.hide();
-			return;
 		}
+	}
 
+	/**
+	 * Handle keyboard input in the input field
+	 */
+	private handleInputKeyDown(e: KeyboardEvent): void {
 		if (e.key === 'Enter') {
 			e.preventDefault();
 			this.submitInput();
 		}
+		// Note: Escape is handled globally by handleGlobalKeyDown
 	}
 
 	/**
