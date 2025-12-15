@@ -21,37 +21,123 @@ export class ChunkingService {
 	}
 
 	/**
-	 * Chunk text by word count
+	 * Chunk text by word count with section awareness
 	 */
 	static chunkByWords(text: string, wordCount: number): ChunkSequence {
 		if (wordCount <= 0) {
 			throw new Error('Word count must be positive');
 		}
 
-		// Strip markdown formatting first
-		const cleanText = this.stripMarkdown(text);
+		// Strip frontmatter first
+		const textWithoutFrontmatter = this.stripFrontmatter(text);
+
+		// Parse into sections
+		const sections = this.parseMarkdownSections(textWithoutFrontmatter);
 
 		// Handle empty text
-		if (cleanText.trim().length === 0) {
+		if (sections.length === 0) {
 			return new ChunkSequence([]);
 		}
 
-		// Split into sentences first to respect boundaries
-		const sentences = this.splitIntoSentences(cleanText);
 		const chunks: Chunk[] = [];
 
-		for (const sentence of sentences) {
-			const words = sentence.trim().split(/\s+/).filter(w => w.length > 0);
+		// Process each section
+		for (let i = 0; i < sections.length; i++) {
+			const section = sections[i];
+			const sectionStartLength = chunks.length;
+
+			// Add section heading as its own chunk if present
+			if (section.heading) {
+				chunks.push(new Chunk(section.heading, chunks.length));
+			}
+
+			// Strip markdown formatting from section content
+			const cleanText = this.stripMarkdown(section.content);
+
+			// Only process content if it's not empty
+			if (cleanText.trim().length > 0) {
+				// Split into sentences to respect boundaries
+				const sentences = this.splitIntoSentences(cleanText);
+
+				for (const sentence of sentences) {
+					const words = sentence.trim().split(/\s+/).filter(w => w.length > 0);
+					
+					// Chunk each sentence by word count
+					for (let j = 0; j < words.length; j += wordCount) {
+						const chunkWords = words.slice(j, j + wordCount);
+						const chunkContent = chunkWords.join(' ');
+						chunks.push(new Chunk(chunkContent, chunks.length));
+					}
+				}
+			}
+
+			// Add a pause after each section if:
+			// 1. We added content for this section (more chunks than when we started)
+			// 2. This isn't the last section
+			const addedContentThisSection = chunks.length > sectionStartLength;
+			const isLastSection = i === sections.length - 1;
 			
-			// Chunk each sentence by word count
-			for (let i = 0; i < words.length; i += wordCount) {
-				const chunkWords = words.slice(i, i + wordCount);
-				const chunkContent = chunkWords.join(' ');
-				chunks.push(new Chunk(chunkContent, chunks.length));
+			if (addedContentThisSection && !isLastSection) {
+				// Small pause represented by ellipsis
+				chunks.push(new Chunk('...', chunks.length));
 			}
 		}
 
 		return new ChunkSequence(chunks);
+	}
+
+	/**
+	 * Strip YAML frontmatter from the beginning of markdown text
+	 */
+	private static stripFrontmatter(text: string): string {
+		// Match frontmatter: --- at start, content, --- at end (with optional trailing newline)
+		const frontmatterRegex = /^---\r?\n([\s\S]*?)\r?\n---(\r?\n|$)/;
+		return text.replace(frontmatterRegex, '');
+	}
+
+	/**
+	 * Parse markdown into sections based on headings
+	 * Returns array of sections with optional heading and content
+	 */
+	private static parseMarkdownSections(text: string): Array<{ heading: string | null; content: string }> {
+		const sections: Array<{ heading: string | null; content: string }> = [];
+		
+		// Split by headings (# at start of line)
+		const lines = text.split(/\r?\n/);
+		let currentHeading: string | null = null;
+		let currentContent: string[] = [];
+
+		for (const line of lines) {
+			// Check if line is a heading
+			const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+			
+			if (headingMatch) {
+				// Save previous section if it has content
+				if (currentContent.length > 0 || currentHeading) {
+					sections.push({
+						heading: currentHeading,
+						content: currentContent.join('\n').trim()
+					});
+				}
+				
+				// Start new section
+				currentHeading = headingMatch[2].trim();
+				currentContent = [];
+			} else {
+				// Add to current section content
+				currentContent.push(line);
+			}
+		}
+
+		// Add final section
+		if (currentContent.length > 0 || currentHeading) {
+			sections.push({
+				heading: currentHeading,
+				content: currentContent.join('\n').trim()
+			});
+		}
+
+		return sections.filter(s => s.heading || s.content.trim().length > 0);
 	}
 
 	/**
